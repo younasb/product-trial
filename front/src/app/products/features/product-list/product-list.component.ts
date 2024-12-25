@@ -1,12 +1,12 @@
-import { Component, OnInit, inject, signal } from "@angular/core";
+import { Component, DestroyRef, OnInit, inject, signal } from "@angular/core";
 import { Product } from "app/products/data-access/product.model";
 import { ProductsService } from "app/products/data-access/products.service";
 import { ProductFormComponent } from "app/products/ui/product-form/product-form.component";
 import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
-import { DataViewModule } from 'primeng/dataview';
-import { DialogModule } from 'primeng/dialog';
-import { TagModule } from 'primeng/tag';
+import { DataViewModule } from "primeng/dataview";
+import { DialogModule } from "primeng/dialog";
+import { TagModule } from "primeng/tag";
 import { CartService } from "../cart/cart.service";
 import { CartItem } from "../cart/cart.model";
 
@@ -32,13 +32,21 @@ const emptyProduct: Product = {
   templateUrl: "./product-list.component.html",
   styleUrls: ["./product-list.component.scss"],
   standalone: true,
-  imports: [DataViewModule, CardModule, ButtonModule, DialogModule, ProductFormComponent, TagModule],
+  imports: [
+    DataViewModule,
+    CardModule,
+    ButtonModule,
+    DialogModule,
+    ProductFormComponent,
+    TagModule,
+  ],
 })
 export class ProductListComponent implements OnInit {
   private readonly productsService = inject(ProductsService);
   private readonly cartService = inject(CartService);
 
   public readonly products = this.productsService.products;
+  private destroyRef = inject(DestroyRef);
   public cartItems: CartItem[] = [];
 
   public isDialogVisible = false;
@@ -47,8 +55,11 @@ export class ProductListComponent implements OnInit {
 
   ngOnInit() {
     this.productsService.get().subscribe();
-    this.cartService.cartItems$.subscribe(items => {
+    const subscription = this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items;
+    });
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
     });
   }
 
@@ -78,12 +89,11 @@ export class ProductListComponent implements OnInit {
   }
 
   public onToggleCart(item: Product): void {
-    if(this.isInCart(item.id)) {
+    if (this.isInCart(item.id)) {
       this.cartService.removeFromCart(item.id);
     } else {
       this.cartService.addToCart(item);
     }
-
   }
 
   public onCancel() {
@@ -94,7 +104,7 @@ export class ProductListComponent implements OnInit {
     this.isDialogVisible = false;
   }
 
-  getSeverity (product: Product) {
+  getSeverity(product: Product) {
     switch (product.inventoryStatus) {
       case "INSTOCK":
         return "success";
@@ -106,11 +116,7 @@ export class ProductListComponent implements OnInit {
         return undefined;
     }
   }
-   isInCart(productId: number): boolean {
+  isInCart(productId: number): boolean {
     return this.cartItems.some((item: CartItem) => item.id === productId);
   }
-  
-
- 
-  
 }

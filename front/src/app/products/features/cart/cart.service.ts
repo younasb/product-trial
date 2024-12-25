@@ -47,7 +47,7 @@ export class CartService {
   updateQuantity(itemId: number, quantity: number) {
     const currentCart = this.cartItemsSubject.value.map((item) => {
       if (item.id === itemId) {
-        return { ...item, quantity }; // Create a new object to trigger change detection
+        return { ...item, quantity };
       }
       return item;
     });

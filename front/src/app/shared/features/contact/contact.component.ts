@@ -51,7 +51,7 @@ export class ContactComponent {
         severity: "success",
         detail: "Demande de contact envoyée avec succès.",
       });
-      this.contactForm.reset(); // Reset the form after submission
+      this.contactForm.reset();
     }
   }
 }
