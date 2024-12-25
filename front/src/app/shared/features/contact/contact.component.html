@@ -1,0 +1,49 @@
+<p-card header="Contact Us" class="p-mb-4">
+  <div class="wrapper">
+    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+      <div class="form-field p-mb-3">
+        <label for="email" class="p-d-block">Email</label>
+        <input
+          pInputText
+          id="email"
+          formControlName="email"
+          [class.ng-invalid]="isFieldInvalid('email')"
+        />
+        @if (isFieldInvalid('email')) {
+        <small class="p-error">
+          Veuillez saisir une adresse mail est valide.
+        </small>
+        }
+      </div>
+
+      <div class="form-field p-mb-3">
+        <label for="message" class="p-d-block">Message</label>
+        <textarea
+          pInputTextarea
+          id="message"
+          formControlName="message"
+          rows="5"
+          cols="30"
+          maxlength="300"
+          [class.ng-invalid]="isFieldInvalid('message')"
+        ></textarea>
+        @if(isFieldInvalid('message')){<small class="p-error">
+          Veuillez saisir un message </small
+        >}
+      </div>
+
+      <div class="p-mt-4 flex justify-content-end">
+        <button
+          pButton
+          type="submit"
+          class="p-button-success"
+          [disabled]="contactForm.invalid"
+        >
+          Envoyer
+        </button>
+      </div>
+    </form>
+  </div>
+</p-card>
+
+<p-toast></p-toast>

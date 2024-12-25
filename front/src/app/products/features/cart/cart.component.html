@@ -1,0 +1,72 @@
+<p-dialog [(visible)]="displayCart" [style]="{ width: '50%' }" header="Panier">
+  @if(cartItems.length) {
+  <p-panel class="mb-4">
+    <p-table [value]="cartItems" [paginator]="false" [rows]="5">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Product</th>
+          <th>Prix_u</th>
+          <th [width]="50">Quantity</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.name }}</td>
+
+          <td>{{ item.price }}€</td>
+          <td>
+            <p-inputNumber
+              [(ngModel)]="item.quantity"
+              [min]="1"
+              [max]="5"
+              (onInput)="updateItemQuantity(item.id, item.quantity)"
+              decrementButtonClass="p-button-danger"
+              incrementButtonClass="p-button-success"
+              incrementButtonIcon="pi pi-plus"
+              decrementButtonIcon="pi pi-minus"
+              [showButtons]="true"
+              buttonLayout="horizontal"
+              inputId="quantityInput"
+              spinnerMode="horizontal"
+            ></p-inputNumber>
+          </td>
+          <td>{{ item.price * item.quantity }}€</td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-danger"
+              (click)="removeItem(item.id)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr>
+          <td colspan="3" class="text-right">Total:</td>
+          <td colspan="2">{{ cartTotal }}€</td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <div class="flex pt-4 justify-content-end">
+      <p-button
+        icon="pi pi-times"
+        [outlined]="true"
+        label="Vider le panier"
+        severity="danger"
+        (onClick)="clearCart()"
+        class="mr-2"
+      />
+      <p-button
+        icon="pi pi-shopping-cart"
+        class="flex-auto md:flex-initial white-space-nowrap"
+        label="Checkout"
+      />
+    </div>
+  </p-panel>
+  } @else {
+  <p>Panier et vide</p>
+  }
+</p-dialog>
