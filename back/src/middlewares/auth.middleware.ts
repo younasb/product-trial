@@ -14,19 +14,15 @@ interface CustomRequest extends ExpressRequest {
 
 const specialAccessRoutes = [
 	{
-		route: '/products/',
-		methods: ['POST']
-	},
-	{
-		route: '/products/:id',
-		methods: ['PATCH', 'DELETE']
+		route: '/products',
+		methods: ['POST', 'PATCH', 'DELETE']
 	}
 ];
 
 const allowedUserEmailForSpecialAccess = 'admin@admin.com';
 
 const allowAccess = (req: CustomRequest): boolean => {
-	const { route, methods } = specialAccessRoutes.find((routeConfig) => routeConfig.route === req.path) ?? {
+	const { route, methods } = specialAccessRoutes.find((routeConfig) => req.path.includes(routeConfig.route)) ?? {
 		route: '',
 		methods: []
 	};
