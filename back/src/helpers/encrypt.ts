@@ -1,8 +1,9 @@
 import * as bycrpt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
+import { envs } from '../core/envs';
 dotenv.config();
-const { JWT_SECRET = '' } = process.env;
+const JWT_SECRET = envs.JWT_SECRET;
 interface payload {
 	id: number;
 }

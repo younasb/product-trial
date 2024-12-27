@@ -5,6 +5,7 @@ import { AccountRepository } from '../repositories/account.repositories';
 import { AppDataSource } from '../data-source';
 import { User } from '../entity/User.entity';
 import { AppError } from '../core/custom.error';
+import { envs } from '../core/envs';
 dotenv.config();
 
 interface CustomRequest extends ExpressRequest {
@@ -12,27 +13,17 @@ interface CustomRequest extends ExpressRequest {
 	userEmail?: string;
 }
 
-const specialAccessRoutes = [
-	{
-		route: '/products',
-		methods: ['POST', 'PATCH', 'DELETE']
-	}
-];
-
-const allowedUserEmailForSpecialAccess = 'admin@admin.com';
-
-const allowAccess = (req: CustomRequest): boolean => {
-	const { route, methods } = specialAccessRoutes.find((routeConfig) => req.path.includes(routeConfig.route)) ?? {
-		route: '',
-		methods: []
-	};
-	if (!route) return true;
-	if (!methods.includes(req.method)) return true;
-	return req.userEmail === allowedUserEmailForSpecialAccess;
-};
-
 export class AuthMiddleware {
-	static verifyToken = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
+	private readonly specialAccessRoutes = [
+		{
+			route: '/products',
+			methods: ['POST', 'PATCH', 'DELETE']
+		}
+	];
+
+	private readonly allowedUserEmailForSpecialAccess = envs.ADMIN_USER;
+
+	public verifyToken = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
 		const accountRepository = new AccountRepository(AppDataSource.getRepository(User));
 		const header = req.headers.authorization;
 		if (!header) {
@@ -46,7 +37,7 @@ export class AuthMiddleware {
 			return;
 		}
 		try {
-			const decoded = jwt.verify(token, process.env.JWT_SECRET ?? '') as { id: number };
+			const decoded = jwt.verify(token, envs.JWT_SECRET) as { id: number };
 
 			if (!decoded) {
 				next(AppError.forbidden('Invalid token', 'UNAUTHORIZED'));
@@ -61,7 +52,7 @@ export class AuthMiddleware {
 			req.userId = decoded.id;
 			req.userEmail = user.email;
 
-			const allow = allowAccess(req);
+			const allow = this.allowAccess(req);
 			if (!allow) {
 				next(AppError.forbidden('You account are not authorized', 'UNAUTHORIZED'));
 
@@ -73,5 +64,15 @@ export class AuthMiddleware {
 		}
 
 		next();
+	};
+
+	private readonly allowAccess = (req: CustomRequest): boolean => {
+		const { route, methods } = this.specialAccessRoutes.find((routeConfig) => req.path.includes(routeConfig.route)) ?? {
+			route: '',
+			methods: []
+		};
+		if (!route) return true;
+		if (!methods.includes(req.method)) return true;
+		return req.userEmail === this.allowedUserEmailForSpecialAccess;
 	};
 }

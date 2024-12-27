@@ -9,15 +9,17 @@ export class AppRoutes {
 
 		const accountController = new AccountController();
 		const productController = new ProductController();
+		const authMiddleware = new AuthMiddleware();
 
+		// router.get('/accounts', accountController.findAll);
 		router.post('/account', accountController.create);
 		router.post('/token', accountController.login);
 
-		router.get('/products', AuthMiddleware.verifyToken, productController.getAll);
-		router.post('/products', AuthMiddleware.verifyToken, productController.create);
-		router.get('/products/:id', AuthMiddleware.verifyToken, productController.getOne);
-		router.patch('/products/:id', AuthMiddleware.verifyToken, productController.update);
-		router.delete('/products/:id', AuthMiddleware.verifyToken, productController.delete);
+		router.get('/products', authMiddleware.verifyToken, productController.getAll);
+		router.post('/products', authMiddleware.verifyToken, productController.create);
+		router.get('/products/:id', authMiddleware.verifyToken, productController.getOne);
+		router.patch('/products/:id', authMiddleware.verifyToken, productController.update);
+		router.delete('/products/:id', authMiddleware.verifyToken, productController.delete);
 
 		return router;
 	}
