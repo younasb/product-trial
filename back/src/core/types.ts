@@ -1,3 +1,5 @@
+import { type Request } from 'express';
+
 export interface ValidationType {
 	constraint: string;
 }
@@ -17,4 +19,9 @@ export interface ErrorResponse {
 export interface HttpConfig {
 	headers?: Record<string, string>;
 	controller?: AbortController;
+}
+
+export interface CustomRequest extends Request {
+	userId?: number;
+	userEmail?: string;
 }

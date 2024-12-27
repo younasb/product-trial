@@ -9,6 +9,15 @@ import { HttpCode } from '../core/constants';
 export class AccountController {
 	private readonly accountRepository = new AccountRepository(AppDataSource.getRepository(User));
 
+	public findAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		try {
+			const users = await this.accountRepository.findAll();
+			res.status(HttpCode.OK).json(users);
+		} catch (error) {
+			next(AppError.internalServer('Failed to fetch users', 'FETCH_USERS_FAILED'));
+		}
+	};
+
 	public create = async (
 		req: Request<unknown, unknown, { username: string; firstname: string; email: string; password: string }>,
 		res: Response,

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Favorite } from './Favorite.entity';
 
 @Entity()
 export class Product {
@@ -41,6 +42,9 @@ export class Product {
 
 	@Column('float', { nullable: true })
 	rating: number;
+
+	@OneToMany(() => Favorite, (favorite) => favorite.product)
+	favorites: Favorite[];
 
 	@CreateDateColumn()
 	createdAt: Date;

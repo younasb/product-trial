@@ -1,17 +1,11 @@
-import { type NextFunction, type Response, type Request as ExpressRequest } from 'express';
+import { type NextFunction, type Response } from 'express';
 import * as jwt from 'jsonwebtoken';
-import * as dotenv from 'dotenv';
 import { AccountRepository } from '../repositories/account.repositories';
 import { AppDataSource } from '../data-source';
 import { User } from '../entity/User.entity';
 import { AppError } from '../core/custom.error';
 import { envs } from '../core/envs';
-dotenv.config();
-
-interface CustomRequest extends ExpressRequest {
-	userId?: number;
-	userEmail?: string;
-}
+import { type CustomRequest } from '../core/types';
 
 export class AuthMiddleware {
 	private readonly specialAccessRoutes = [
